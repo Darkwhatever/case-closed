@@ -10,17 +10,120 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(cuid())
-  clerkUserId  String         @unique
-  email        String         @unique
-  username     String         @unique
-  firstName    String?
-  lastName     String?
-  avatarUrl    String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  lastActiveAt DateTime       @default(now())
+  id               String         @id @default(cuid())
+  clerkUserId      String         @unique
+  email            String         @unique
+  username         String         @unique
+  firstName        String?
+  lastName         String?
+  avatarUrl        String?
+  userRole         UserRole       @default(USER)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  lastActiveAt     DateTime       @default(now())
+  cases            Case[]
+  casePlaySession  CasePlaySession[]
+  userCaseHistory  UserCaseHistory[]
 }
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+model Case {
+  id                  String         @id @default(cuid())
+  authorId            String
+
+  title               String
+  slug                String?
+  description         String?
+  difficulty          CaseDifficulty
+  estimatedMins       Int?
+  solveCount          Int            @default(0)
+  coverUrl            String?
+  status              CaseStatus     @default(DRAFT)
+  averageRating       Float?  
+  totalReviews        Int            @default(0)
+
+  publishedAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  author              User           @relation(fields: [authorId], references: [id])
+  tags                Tag[]
+  userCaseHistory     UserCaseHistory[]
+  casePlaySession     CasePlaySession[]
+}
+
+
+model Tag {
+  id               String         @id @default(cuid())
+  name             String         @unique
+  slug             String         @unique
+  type             String
+  description      String?
+  isFeatured       Boolean        @default(false)
+  displayOrder     Int            @default(0)
+  cases            Case[]
+
+  @@index([type, isFeatured, displayOrder])
+
+}
+
+enum CaseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+} 
+
+enum CaseDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  SHERLOCKIAN
+}
+
+model UserCaseHistory {
+  id               String         @id @default(cuid())
+  userId           String
+  caseId           String
+
+  solvedInSecs     Int?  
+  solvedAfter      Int?           //Number of attempts before solving it for the first time    
+  totalAttempts    Int            @default(0)
+  totalSecs        Int            @default(0)
+  caseState        CaseState      @default(UNSOLVED)
+  solvedAt         DateTime?
+
+  case             Case           @relation(fields: [caseId], references: [id])
+  user             User           @relation(fields: [userId], references: [id])
+
+  @@index([caseId, caseState])
+  @@unique([userId, caseId])
+}
+
+enum CaseState {
+  UNSOLVED
+  SOLVED
+}
+
+model CasePlaySession {
+  id               String         @id @default(cuid())
+  userId           String
+  caseId           String
+  secondsPlayed    Int            @default(0)
+  startedAt        DateTime       @default(now())
+  endedAt          DateTime?
+  lastPlayed       DateTime       @updatedAt 
+  case             Case           @relation(fields: [caseId], references: [id])
+  user             User           @relation(fields: [userId], references: [id])
+
+  @@index([caseId, startedAt])
+  @@index([userId, caseId])
+}
+
 
 
 
