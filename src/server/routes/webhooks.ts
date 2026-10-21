@@ -16,7 +16,7 @@ webhooks.post("/clerk", async (c) => {
     return c.text("Missing webhook secret from environment variables", 500);
   }
 
-  // mandatory svix security headers
+  // mandatory svix security headers for verification
   const svix_id = c.req.header("svix-id");
   const svix_timestamp = c.req.header("svix-timestamp");
   const svix_signature = c.req.header("svix-signature");

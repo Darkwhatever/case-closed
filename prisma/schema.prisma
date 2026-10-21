@@ -90,7 +90,7 @@ model UserCaseHistory {
   userId           String
   caseId           String
 
-  solvedInSecs     Int?  
+  solvedInSecs     Int?           //Time it took to solve the case in seconds, gets converted to minutes in the Frontend
   solvedAfter      Int?           //Number of attempts before solving it for the first time    
   totalAttempts    Int            @default(0)
   totalSecs        Int            @default(0)

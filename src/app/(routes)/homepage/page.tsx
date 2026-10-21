@@ -8,9 +8,21 @@ const page = async () => {
 
   if (!userId) return redirectToSignIn();
 
+  const getUser = async () => {
+    "use cache";
+    return db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+  };
+
+  const user = await getUser();
+
+  if (!user) return redirectToSignIn();
   return (
-    <div className="flex flex-col min-h-screen w-full">
-      <Header />
+    <div className="relative flex flex-col min-h-screen w-full">
+      <Header user={user} />
     </div>
   );
 };
