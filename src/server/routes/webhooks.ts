@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Webhook } from "svix";
 import { WebhookEvent } from "@clerk/backend";
-import { db } from "@/prisma/prismaDB";
+import { db } from "@/src/server/prisma/prismaDB";
 
 const webhooks = new Hono();
 

@@ -23,6 +23,7 @@
 
   --font-sans: var(--font-sans, system-ui, sans-serif);
   --font-mono: var(--font-geist-mono, monospace);
+  --font-lachesis: var(--font-lachesis-local);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -70,4 +71,7 @@
   html {
     @apply font-sans;
   }
+}
+
+@theme inline {
 }

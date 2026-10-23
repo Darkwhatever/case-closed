@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import QueryProvider from "../lib/reactQueryProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -20,9 +21,15 @@ const geistMono = Geist_Mono({
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-cormorant",
+});
+
+const lachesis = localFont({
+  src: "../../public/fonts/Lachesis Regular.ttf",
+  variable: "--font-lachesis-local",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -33,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${lachesis.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ClerkProvider>

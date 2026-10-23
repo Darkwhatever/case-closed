@@ -1,0 +1,14 @@
+export type UserProfile = {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string | null;
+  avatarUrl: string | null;
+  lastActiveAt: Date;
+};
+
+export type HeaderIcon = {
+  username: string;
+  firstName: string;
+  avatarUrl: string | null;
+};
