@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import UserIcon from "./UserIcon";
 import SearchBar from "./SearchBar";
 import Notifications from "./Notifications";
+import SearchButton from "./SearchButton";
+import Navigations from "./Navigations";
 type Props = {
   userId: string | null;
 };
@@ -20,23 +22,19 @@ const Header = ({ userId }: Props) => {
   }, []);
 
   return (
-    <motion.div
-      className="absolute top-0 right-0 flex w-full h-16 bg-[#02070f] items-center justify-between px-4 py-1 z-100"
-      style={{ borderBottom: "0.5px solid #122446" }}
-    >
-      <div>
+    <motion.div className="absolute top-0 right-0 flex w-full h-14 bg-transparent items-center justify-between px-10 py-1 z-100 pointer-events-none">
+      <div className="flex flex-row justify-start items-center gap-6 pointer-events-auto">
         <Link href="/">
-          <h1 className="text-[1.5rem] font-semibold font-lachesis text-[#e7e7e7] tracking-wider select-none cursor-pointer">
+          <h1 className="text-[1.25rem] font-semibold font-lachesis text-[#e7e7e7] tracking-wider select-none cursor-pointer pointer-events-auto">
             Case Closed
           </h1>
         </Link>
+
+        <Navigations />
       </div>
 
-      <div>
-        <SearchBar />
-      </div>
-
-      <div className="flex flex-row gap-4 items-center justify-center">
+      <div className="flex flex-row gap-3 items-center justify-center pointer-events-auto">
+        <SearchButton />
         <Notifications />
         {user && !isPending && isMounted && (
           <UserIcon user={user} isPending={isPending} />

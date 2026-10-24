@@ -13,10 +13,6 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         <Header userId={userId} />
       </aside>
 
-      <aside>
-        <LeftPanel />
-      </aside>
-
       <main>{children}</main>
     </div>
   );
