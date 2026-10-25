@@ -1,5 +1,9 @@
 export const navigationLabels = (setSelectedTap: any) => [
-  { id: "home", label: "Discover", action: () => setSelectedTap("home") },
+  {
+    id: "discover",
+    label: "Discover",
+    action: () => setSelectedTap("discover"),
+  },
   { id: "cases", label: "Cases", action: () => setSelectedTap("cases") },
   {
     id: "myCases",

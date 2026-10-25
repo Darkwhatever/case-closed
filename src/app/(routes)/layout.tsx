@@ -8,7 +8,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   const { userId } = await auth();
 
   return (
-    <div className="relative flex  min-h-screen w-full">
+    <div className="relative flex  min-h-screen w-full justify-center">
       <aside>
         <Header userId={userId} />
       </aside>
