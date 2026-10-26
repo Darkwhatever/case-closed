@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { getAuth } from "@clerk/hono";
-import { db } from "@/src/server/prisma/prismaDB";
+import { db } from "@/prisma/prismaDB";
 import type { HonoEnv } from "../types/hono";
 
 export const requireDbUser = createMiddleware<HonoEnv>(async (c, next) => {

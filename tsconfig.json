@@ -31,7 +31,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts",
-    "src/server/prisma/prismaDB.ts"
+    "prisma/prismaDB.ts"
   ],
   "exclude": ["node_modules"]
 }
