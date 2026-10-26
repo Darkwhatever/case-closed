@@ -1,29 +1,33 @@
 generator client {
-  provider = "prisma-client"
-  output   = "./generated"
-    previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client"
+  output          = "./generated"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-    extensions = [pgvector(map: "vector")]
+  provider   = "postgresql"
+  extensions = [pgvector(map: "vector")]
 }
 
 model User {
-  id               String         @id @default(cuid())
-  clerkUserId      String         @unique
-  email            String         @unique
-  username         String         @unique
-  firstName        String?
-  lastName         String?
-  avatarUrl        String?
-  userRole         UserRole       @default(USER)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  lastActiveAt     DateTime       @default(now())
-  cases            Case[]
-  casePlaySession  CasePlaySession[]
-  userCaseHistory  UserCaseHistory[]
+  id                     String               @id @default(cuid())
+  clerkUserId            String               @unique
+  email                  String               @unique
+  username               String               @unique
+  firstName              String?
+  lastName               String?
+  avatarUrl              String?
+  userRole               UserRole             @default(USER)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  lastActiveAt           DateTime             @default(now())
+  cases                  Case[]
+  casePlaySession        CasePlaySession[]
+  userCaseHistory        UserCaseHistory[]
+  following              UserFollow[]         @relation("UserFollows")
+  followers              UserFollow[]         @relation("UserFollowedBy")
+  caseSaved              CaseSaved[]
+  caseReports            CaseReports[]
 }
 
 enum UserRole {
@@ -32,51 +36,155 @@ enum UserRole {
   ADMIN
 }
 
-model Case {
-  id                  String         @id @default(cuid())
-  authorId            String
+model UserFollow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
 
-  title               String
-  slug                String?
-  description         String?
-  difficulty          CaseDifficulty
-  estimatedMins       Int?
-  solveCount          Int            @default(0)
-  coverUrl            String?
-  status              CaseStatus     @default(DRAFT)
-  averageRating       Float?  
-  totalReviews        Int            @default(0)
+  follower                User                @relation("UserFollows", fields:[followerId], references:[id], onDelete: Cascade)
+  following               User                @relation("UserFollowedBy", fields:[followingId], references:[id], onDelete: Cascade)
 
-  publishedAt         DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-
-  author              User           @relation(fields: [authorId], references: [id])
-  tags                Tag[]
-  userCaseHistory     UserCaseHistory[]
-  casePlaySession     CasePlaySession[]
+  @@id([followerId, followingId])
+  @@index([followingId, createdAt])
 }
 
+model Case {
+  id                     String               @id @default(cuid())
+  authorId               String
+
+  title                  String
+  slug                   String?              @unique
+  description            String?
+  difficulty             CaseDifficulty
+  estimatedMins          Int?
+  solveCount             Int                  @default(0)
+  coverUrl               String?
+  bannerUrl              String?
+
+  status                 CaseStatus           @default(DRAFT)
+  averageRating          Float?
+  totalReviews           Int                  @default(0)
+
+  publishedAt            DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  author                 User                 @relation(fields: [authorId], references: [id])
+  tags                   Tag[]
+  caseDocument           CaseDocument[]
+  casePerson             CasePerson[]
+  caseLocation           CaseLocation[]
+  photograph             Photograph[]
+  userCaseHistory        UserCaseHistory[]
+  casePlaySession        CasePlaySession[]
+  caseSaved              CaseSaved[]
+
+  caseReports            CaseReports[] // Related to the reports users can make regarding the case to the admins of the site
+
+  @@index([id, authorId, title])
+}
+
+model CaseDocument {
+  id                     String               @id @default(cuid())
+  caseId                 String
+  type                   CaseDocumentType
+  title                  String
+  position               Int                  @default(0)
+
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  witnessStatement       WitnessStatement?
+  incidentReport         IncidentReport?
+  forensicReport         ForensicReport?
+  correspondence         Correspondence?
+  interviewTranscript    InterviewTranscript?
+  evidenceExhibit        EvidenceExhibit?
+
+
+  @@index([caseId, position])
+  @@index([caseId, type])
+}
+
+enum CaseDocumentType {
+  INCIDENT_REPORT
+  WITNESS_STATEMENT
+  FORENSIC_REPORT
+  CORRESPONDENCE
+  INTERVIEW_TRANSCRIPT
+  EVIDENCE_EXHIBIT
+  OTHER
+}
+model CasePerson {
+  id                     String               @id @default(cuid())
+  caseId                 String
+  displayName            String
+  isAnonymous            Boolean              @default(false)
+  roles                  CasePersonRole[]     @default([])
+  description            String?
+  portraitUrl            String?
+  creatorNotes           String?
+
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  witnessStatements      WitnessStatement[]   @relation("StatementWitness")
+  reports                IncidentReport[]     @relation("ReportOfficer")
+  forensicReports        ForensicReport[]     @relation("ForensicExaminer")
+
+  sentCorrespondence     Correspondence[]     @relation("CorrespondenceSender")
+  receivedCorrespondence Correspondence[]     @relation("CorrespondenceRecipient")
+
+  interviewsConducted    InterviewTranscript[] @relation("InterviewInterviewer")
+  interviewsAttended     InterviewTranscript[] @relation("InterviewInterviewee")
+
+  collectedExhibits      EvidenceExhibit[]    @relation("ExhibitCollector")
+  photograph             Photograph[]         @relation("PhotographTakenBy")
+  @@index([caseId])
+}
+
+enum CasePersonRole {
+  SUSPECT
+  WITNESS
+  VICTIM
+  INVESTIGATOR
+  OTHER
+}
+
+model CaseLocation {
+  id                     String               @id @default(cuid())
+  caseId                 String
+  name                   String
+  description            String?
+  imageUrl               String?
+
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  witnessStatements      WitnessStatement[]   @relation("StatementLocation")
+  incidentReports        IncidentReport[]     @relation("IncidentLocation")
+  interviews             InterviewTranscript[] @relation("InterviewLocation")
+  exhibits               EvidenceExhibit[]    @relation("ExhibitLocation")
+  Photograph             Photograph[]         @relation("PhotographLocation")
+  @@index([caseId])
+}
 
 model Tag {
-  id               String         @id @default(cuid())
-  name             String         @unique
-  slug             String         @unique
-  type             String
-  description      String?
-  isFeatured       Boolean        @default(false)
-  displayOrder     Int            @default(0)
-  cases            Case[]
+  id                     String               @id @default(cuid())
+  name                   String               @unique
+  slug                   String               @unique
+  type                   String
+  description            String?
+  isFeatured             Boolean              @default(false)
+  displayOrder           Int                  @default(0)
+  cases                  Case[]
 
   @@index([type, isFeatured, displayOrder])
-
 }
 
 enum CaseStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
-} 
+}
 
 enum CaseDifficulty {
   BEGINNER
@@ -86,22 +194,22 @@ enum CaseDifficulty {
 }
 
 model UserCaseHistory {
-  id               String         @id @default(cuid())
-  userId           String
-  caseId           String
+  id                     String               @id @default(cuid())
+  userId                 String
+  caseId                 String
 
-  solvedInSecs     Int?           //Time it took to solve the case in seconds, gets converted to minutes in the Frontend
-  solvedAfter      Int?           //Number of attempts before solving it for the first time    
-  totalAttempts    Int            @default(0)
-  totalSecs        Int            @default(0)
-  caseState        CaseState      @default(UNSOLVED)
-  solvedAt         DateTime?
+  solvedInSecs           Int?                 //Time it took to solve the case in seconds, gets converted to minutes in the Frontend
+  solvedAfter            Int?                 //Number of attempts before solving it for the first time
+  totalAttempts          Int                  @default(0)
+  totalSecs              Int                  @default(0)
+  caseState              CaseState            @default(UNSOLVED)
+  solvedAt               DateTime?
 
-  case             Case           @relation(fields: [caseId], references: [id])
-  user             User           @relation(fields: [userId], references: [id])
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([caseId, caseState])
   @@unique([userId, caseId])
+  @@index([caseId, caseState])
 }
 
 enum CaseState {
@@ -110,20 +218,154 @@ enum CaseState {
 }
 
 model CasePlaySession {
-  id               String         @id @default(cuid())
-  userId           String
-  caseId           String
-  secondsPlayed    Int            @default(0)
-  startedAt        DateTime       @default(now())
-  endedAt          DateTime?
-  lastPlayed       DateTime       @updatedAt 
-  case             Case           @relation(fields: [caseId], references: [id])
-  user             User           @relation(fields: [userId], references: [id])
+  id                     String               @id @default(cuid())
+  userId                 String
+  caseId                 String
+  secondsPlayed          Int                  @default(0)
+  startedAt              DateTime             @default(now())
+  endedAt                DateTime?
+  lastPlayed             DateTime             @updatedAt
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([caseId, startedAt])
   @@index([userId, caseId])
 }
 
+model CaseSaved {
+  id                     String               @id @default(cuid())
+  userId                 String
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  caseId                 String
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, caseId])
+}
+
+model CaseReports {
+  id                     String               @id @default(cuid())
+  userId                 String
+  caseId                 String
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportType             ReportType
+  message                String?
+  evidenceImg            String?              //An optional image that the user can provide as evidence
+  createdAt              DateTime             @default(now())
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
 
+  @@index([caseId, reportType, userId])
+}
 
+enum ReportType {
+  UNFAIR
+  PLAGIARISM
+  OFFENSIVE
+  BOTTING
+  EXPLOITING
+  BROKEN
+}
+
+// Different types of documents that the Author/Creator of the cases can create
+model WitnessStatement {
+  documentId             String               @id
+  witnessPersonId        String?
+  statementAt            DateTime?
+  locationId             String?
+  locationLabel          String?
+  statementContent       Json
+  signatureText          String?
+
+  document               CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  witness                CasePerson?          @relation("StatementWitness", fields: [witnessPersonId], references: [id], onDelete: Restrict)
+  location               CaseLocation?        @relation("StatementLocation", fields: [locationId], references: [id], onDelete: Restrict)
+}
+
+model IncidentReport {
+  documentId             String               @id
+  reportNumber           String?
+  incidentAt             DateTime?
+  reportingOfficerId     String?
+  locationId             String?
+  locationLabel          String?
+  narrative              Json
+
+  document               CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportingOfficer       CasePerson?          @relation("ReportOfficer", fields: [reportingOfficerId], references: [id], onDelete: Restrict)
+  location               CaseLocation?        @relation("IncidentLocation", fields: [locationId], references: [id], onDelete: Restrict)
+}
+
+model ForensicReport {
+  documentId             String               @id
+  reportNumber           String?
+  examinerId             String?
+  examinedAt             DateTime?
+  method                 Json?
+  findings               Json
+  conclusion             Json?
+  providedImg            String?
+  document               CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  examiner               CasePerson?          @relation("ForensicExaminer", fields: [examinerId], references: [id], onDelete: Restrict)
+}
+
+model Correspondence {
+  documentId             String               @id
+  senderId               String?
+  recipientId            String?
+  sentAt                 DateTime?
+  subject                String?
+  body                   Json
+
+  document               CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  sender                 CasePerson?          @relation("CorrespondenceSender", fields: [senderId], references: [id], onDelete: Restrict)
+  recipient              CasePerson?          @relation("CorrespondenceRecipient", fields: [recipientId], references: [id], onDelete: Restrict)
+}
+
+model InterviewTranscript {
+  documentId             String               @id
+  interviewerId          String?
+  intervieweeId          String?
+  interviewAt            DateTime?
+  locationId             String?
+  locationLabel          String?
+  transcript             Json
+
+  document         CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  interviewer      CasePerson?          @relation("InterviewInterviewer", fields: [interviewerId], references: [id], onDelete: Restrict)
+  interviewee      CasePerson?          @relation("InterviewInterviewee", fields: [intervieweeId], references: [id], onDelete: Restrict)
+  location         CaseLocation?        @relation("InterviewLocation", fields: [locationId], references: [id], onDelete: Restrict)
+}
+
+model EvidenceExhibit {
+  documentId             String               @id
+  exhibitNumber          String?
+  evidenceCategory       String?
+  collectedAt            DateTime?
+  collectedById          String?
+  locationId             String?
+  locationLabel          String?
+  description            Json
+  providedImg            String?
+  document               CaseDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  collectedBy            CasePerson?          @relation("ExhibitCollector", fields: [collectedById], references: [id], onDelete: Restrict)
+  location               CaseLocation?        @relation("ExhibitLocation", fields: [locationId], references: [id], onDelete: Restrict)
+}
+
+model Photograph {
+  id                     String               @id @default(cuid())
+  imageNumber            String?
+  imageUrl               String
+  caption                String?
+  altText                String?
+  takenByPersonId        String?              
+  takenAt                DateTime?
+  position               Int?                 @default(0)
+  locationId             String?
+  caseId                 String
+  case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  location               CaseLocation?        @relation("PhotographLocation", fields:[locationId], references: [id], onDelete: Restrict)
+  takenBy                CasePerson?          @relation("PhotographTakenBy", fields:[takenByPersonId], references: [id], onDelete: Restrict)
+
+  @@unique([caseId, imageNumber])
+  @@index([caseId, position])
+}
