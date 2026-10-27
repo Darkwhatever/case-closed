@@ -7,7 +7,7 @@ export type UserProfile = {
   lastActiveAt: Date;
 };
 
-export type HeaderIcon = {
+export type HeaderUserIcon = {
   username: string;
   firstName: string;
   avatarUrl: string | null;

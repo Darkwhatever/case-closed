@@ -7,6 +7,7 @@ import QueryProvider from "../lib/reactQueryProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "../components/ui/toast";
 import { Suspense } from "react";
+import GlobalEffects from "../components/GlobalEffects";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <main className="min-h-screen w-full overflow-x-hidden">
                 {children}
               </main>
+
+              <GlobalEffects />
             </Suspense>
             <Toaster />
             <ReactQueryDevtools />

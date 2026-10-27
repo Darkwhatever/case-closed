@@ -1,6 +1,7 @@
-import type { HeaderIcon, UserProfile } from "../interfaces/userInterfaces";
+import type { HeaderUserIcon } from "../interfaces/userInterfaces";
 import { hc } from "hono/client";
 import type { AppType } from "../server";
+import type { UserProfile } from "../interfaces/userInterfaces";
 
 export const client: any = hc<AppType>("/", {
   init: {
@@ -26,5 +27,5 @@ export const fetchUserIcon = async () => {
     throw new Error(`Failed to fetch user (${response.status})`);
   }
 
-  return (await response.json()) as HeaderIcon;
+  return (await response.json()) as HeaderUserIcon;
 };

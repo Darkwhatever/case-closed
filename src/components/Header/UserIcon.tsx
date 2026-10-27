@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import type { HeaderIcon } from "@/src/interfaces/userInterfaces";
+import type { HeaderUserIcon } from "@/src/interfaces/userInterfaces";
 import Image from "next/image";
 
 type Props = {
-  user: HeaderIcon;
+  user: HeaderUserIcon;
   isPending: boolean;
 };
 const UserIcon = ({ user, isPending }: Props) => {

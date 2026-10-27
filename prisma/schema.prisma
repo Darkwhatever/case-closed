@@ -21,12 +21,12 @@ model User {
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   lastActiveAt           DateTime             @default(now())
-  cases                  Case[]
+  caseList               UserCaseList[]
+  createdCases           Case[]
   casePlaySession        CasePlaySession[]
   userCaseHistory        UserCaseHistory[]
   following              UserFollow[]         @relation("UserFollows")
   followers              UserFollow[]         @relation("UserFollowedBy")
-  caseSaved              CaseSaved[]
   caseReports            CaseReports[]
 }
 
@@ -77,7 +77,7 @@ model Case {
   photograph             Photograph[]
   userCaseHistory        UserCaseHistory[]
   casePlaySession        CasePlaySession[]
-  caseSaved              CaseSaved[]
+  userCaseList           UserCaseList[]
 
   caseReports            CaseReports[] // Related to the reports users can make regarding the case to the admins of the site
 
@@ -232,14 +232,32 @@ model CasePlaySession {
   @@index([userId, caseId])
 }
 
-model CaseSaved {
-  id                     String               @id @default(cuid())
+model UserCaseList {
+  id                     String               @id @default(uuid())
   userId                 String
   user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
   caseId                 String
   case                   Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, caseId])
+  // Tracker States & Metrics
+  status                 CaseListStatus       @default(BOOKMARKED)
+  rating                 Int?                 // 1 - 10
+  logicRating            Int?                 // 1 - 5
+  progressPct            Int                  @default(0)
+  detectiveNotes         String?              @db.Text // Store private user notes about clues
+  updatedAt              DateTime             @updatedAt
+  createdAt              DateTime             @default(now())
+
+  @@unique([userId, caseId]) 
+}
+
+enum CaseListStatus {
+  ACTIVE       // "Active Investigations"
+  CLOSED       // "Closed Cases"
+  COLD         // "Cold Cases"
+  ABANDONED    // "Unsolved / Walked Away"
+  BOOKMARKED   // "Case Files / Backlog"
 }
 
 model CaseReports {

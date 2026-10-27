@@ -2,7 +2,6 @@
 import { db } from "@/prisma/prismaDB";
 import { auth } from "@clerk/nextjs/server";
 import Header from "../../components/Header/Header";
-import LeftPanel from "@/src/components/LeftPanel/LeftPanel";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const { userId } = await auth();

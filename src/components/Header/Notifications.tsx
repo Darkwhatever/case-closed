@@ -3,8 +3,8 @@ import React from "react";
 
 const Notifications = () => {
   return (
-    <button className="flex p-2 items-center justify-center cursor-pointer mt-1">
-      <Bell size={24} />
+    <button className="flex h-10 w-10 items-center justify-center rounded-full cursor-pointer">
+      <Bell size={22} />
     </button>
   );
 };

@@ -3,8 +3,8 @@ import { Search } from "lucide-react";
 
 const SearchButton = () => {
   return (
-    <button className="flex p-2 items-center justify-center cursor-pointer mt-1">
-      <Search size={24} />
+    <button className="flex h-10 w-10 items-center justify-center rounded-full cursor-pointer">
+      <Search size={22} />
     </button>
   );
 };
