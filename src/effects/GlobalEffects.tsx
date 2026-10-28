@@ -10,6 +10,8 @@ const GlobalEffects = () => {
   useLayoutEffect(() => {
     if (pathname.startsWith("/homepage")) {
       setSelectedTap(selectedTap);
+    } else if (pathname.startsWith("/cases")) {
+      setSelectedTap("cases");
     } else if (pathname.startsWith("/studio/")) {
       setSelectedTap("studio");
     } else if (pathname.startsWith("/profile/")) {

@@ -7,7 +7,7 @@ import QueryProvider from "../lib/reactQueryProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "../components/ui/toast";
 import { Suspense } from "react";
-import GlobalEffects from "../components/GlobalEffects";
+import GlobalEffects from "../effects/GlobalEffects";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
