@@ -18,10 +18,10 @@ export const navigationLabels = ({
     action: () => setSelectedTap("cases"),
   },
   {
-    id: "myCases",
+    id: "caselist",
     label: "My Cases",
     route: `/caselist/${username}`,
-    action: () => setSelectedTap("myCases"),
+    action: () => setSelectedTap("caselist"),
   },
   {
     id: "studio",

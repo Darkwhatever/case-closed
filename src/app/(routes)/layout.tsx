@@ -2,6 +2,7 @@
 import { db } from "@/prisma/prismaDB";
 import { auth } from "@clerk/nextjs/server";
 import Header from "../../components/Header/Header";
+import AnimatePresencePresist from "@/src/components/AnimatePresencePresist";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const { userId } = await auth();
@@ -11,8 +12,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       <aside>
         <Header userId={userId} />
       </aside>
-
-      <main>{children}</main>
+      <AnimatePresencePresist>{children}</AnimatePresencePresist>
     </div>
   );
 };

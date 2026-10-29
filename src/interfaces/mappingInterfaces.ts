@@ -1,4 +1,4 @@
-export type TapId = "discover" | "cases" | "myCases" | "studio" | "profile";
+export type TapId = "discover" | "cases" | "caselist" | "studio" | "profile";
 
 export type NavigationLabelsProps = {
   setSelectedTap: (value: TapId) => void;

@@ -1,7 +1,7 @@
 import { navigationLabels } from "@/src/lib/mapping/headerMaps";
 import { setSelectedTap, useGlobalStore } from "@/src/stores/globalStore";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 
 const Navigations = ({ username }: { username: string }) => {
   const selectedTap = useGlobalStore((state) => state.selectedTap);
@@ -9,8 +9,15 @@ const Navigations = ({ username }: { username: string }) => {
   const router = useRouter();
   const navigations = navigationLabels({ setSelectedTap, router, username });
 
-  const { id, route } =
-    navigations.find((item) => item?.id === selectedTap) || {};
+  useLayoutEffect(() => {
+    const { id } = navigations.find((item) => item.route === pathname) || {};
+
+    if (id && selectedTap !== id) setSelectedTap(id);
+  }, []);
+
+  useEffect(() => {
+    console.log(selectedTap);
+  }, [selectedTap]);
 
   return (
     <nav className="flex flex-row items-center justify-center gap-1 sm:gap-2 select-none">
@@ -21,7 +28,7 @@ const Navigations = ({ username }: { username: string }) => {
           if (id === selectedTap) return;
           action();
 
-          if (pathname !== route) router.replace(route);
+          if (pathname !== route) router.push(route);
         };
         return (
           <button
