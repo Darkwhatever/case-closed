@@ -2,22 +2,30 @@
 import Link from "next/link";
 import { getUserIcon } from "@/src/lib/queries/userQueries";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useEffect, useMemo, useState, useLayoutEffect } from "react";
 import UserIcon from "./UserIcon";
 import { usePathname } from "next/navigation";
 import Notifications from "./Notifications";
 import SearchButton from "./SearchButton";
 import Navigations from "./Navigations";
 import Image from "next/image";
+import { useHeaderVariants } from "@/src/motion/variants/headerVariants";
 type Props = {
   userId: string | null;
 };
 
 const Header = ({ userId }: Props) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [headerEntered, setHeaderEntered] = useState(false);
   const pathname = usePathname();
+  const isStudioRoute = pathname.startsWith("/studio");
   const { data: user, isPending } = useQuery(getUserIcon({ userId }));
+
+  const headerVariants = useMemo(
+    () => useHeaderVariants(isStudioRoute),
+    [pathname, isStudioRoute],
+  );
 
   const { username } = user || {};
   useEffect(() => {
@@ -25,9 +33,16 @@ const Header = ({ userId }: Props) => {
   }, []);
 
   if (pathname === "/sign-in" || pathname === "/sign-up") return null;
+
   return (
     <AnimatePresence mode="popLayout">
-      <motion.header className="absolute inset-x-0 top-0 z-100 flex h-16 w-full items-center justify-between bg-transparent px-4 sm:px-6 lg:px-9 pointer-events-none">
+      <motion.header
+        variants={headerVariants as Variants}
+        initial="initial"
+        animate={headerEntered ? "resting" : "entering"}
+        onAnimationComplete={() => setHeaderEntered(true)}
+        className="absolute inset-x-0 top-0 z-100 flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-9 pointer-events-none"
+      >
         <div className="flex min-w-0 flex-row items-center justify-start gap-4 sm:gap-8 pointer-events-auto">
           <Link
             href="/"
