@@ -11,14 +11,17 @@ export default function AnimatePresencePresist({
   const pathname = usePathname();
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence
+      mode="popLayout"
+      onExitComplete={() => window.scrollTo(0, 0)}
+    >
       <motion.div
         key={pathname}
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ duration: 0.25, ease: "easeInOut" }}
-        className="w-full"
+        className="w-full h-full"
       >
         <FrozenRoute>
           <main>{children}</main>

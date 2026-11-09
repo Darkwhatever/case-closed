@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getUserIcon } from "@/src/lib/queries/userQueries";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { useEffect, useMemo, useState, useLayoutEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserIcon from "./UserIcon";
 import { usePathname } from "next/navigation";
 import Notifications from "./Notifications";
@@ -21,7 +21,6 @@ const Header = ({ userId }: Props) => {
   const pathname = usePathname();
   const isStudioRoute = pathname.startsWith("/studio");
   const { data: user, isPending } = useQuery(getUserIcon({ userId }));
-
   const headerVariants = useMemo(
     () => useHeaderVariants(isStudioRoute),
     [pathname, isStudioRoute],
