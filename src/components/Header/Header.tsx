@@ -10,7 +10,7 @@ import Notifications from "./Notifications";
 import SearchButton from "./SearchButton";
 import Navigations from "./Navigations";
 import Image from "next/image";
-import { useHeaderVariants } from "@/src/motion/variants/headerVariants";
+import { useHeaderVariants } from "@/src/components/Header/Motion/headerVariants";
 type Props = {
   userId: string | null;
 };
@@ -40,7 +40,7 @@ const Header = ({ userId }: Props) => {
         initial="initial"
         animate={headerEntered ? "resting" : "entering"}
         onAnimationComplete={() => setHeaderEntered(true)}
-        className="absolute inset-x-0 top-0 z-100 flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-9 pointer-events-none"
+        className="header absolute inset-x-0 top-0 z-100 flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-9 pointer-events-none"
       >
         <div className="flex min-w-0 flex-row items-center justify-start gap-4 sm:gap-8 pointer-events-auto">
           <Link

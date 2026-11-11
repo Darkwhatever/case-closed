@@ -1,15 +1,33 @@
 "use client";
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
-import FrozenRoute from "./FrozenRoute";
 
-export default function AnimatePresencePresist({
+import FrozenRoute from "@/src/components/FrozenRoute";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { usePathname } from "next/navigation";
+
+export default function RoutesPresister({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const parentVariants: Variants = {
+    hidden: { opacity: 0 },
 
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+      },
+    },
+
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 3,
+        ease: "easeInOut",
+      },
+    },
+  };
   return (
     <AnimatePresence
       mode="popLayout"
@@ -17,15 +35,12 @@ export default function AnimatePresencePresist({
     >
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -15 }}
-        transition={{ duration: 0.25, ease: "easeInOut" }}
-        className="w-full h-full"
+        variants={parentVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
       >
-        <FrozenRoute>
-          <main>{children}</main>
-        </FrozenRoute>
+        <FrozenRoute>{children}</FrozenRoute>
       </motion.div>
     </AnimatePresence>
   );

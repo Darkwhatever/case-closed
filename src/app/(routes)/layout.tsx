@@ -8,12 +8,12 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   const { userId } = await auth();
 
   return (
-    <div className="relative flex min-h-screen w-full justify-center">
+    <div className="relative flex min-h-screen w-full ">
       <aside>
         <Header userId={userId} />
       </aside>
 
-      <main>{children}</main>
+      <AnimatePresencePresist>{children}</AnimatePresencePresist>
     </div>
   );
 };

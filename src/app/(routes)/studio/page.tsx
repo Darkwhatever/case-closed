@@ -8,7 +8,7 @@ export default async function CreatePage() {
   const { userId } = await auth();
 
   return (
-    <div className="flex flex-col w-full px-15 py-20 no-scrollbar">
+    <div className="relative flex flex-col min-w-screen min-h-screen px-15 py-20 no-scrollbar">
       <Suspense fallback={<div>Loading...</div>}>
         <main>
           <StudioClient />
